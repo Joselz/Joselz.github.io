@@ -1,0 +1,153 @@
+<html>
+
+<head>
+    <title>Licenciamentos - Situações para resolução</title>
+    <script src="jquery-3.2.1.min.js"></script>
+    <script src="xlsx.full.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.15/datatables.min.css" />
+    <script type="text/javascript" src="https://cdn.datatables.net/r/bs-3.3.5/jqc-1.11.3,dt-1.10.8/datatables.min.js"></script>
+    <script src="moment.js"></script>
+    <script>
+        moment().format();
+    </script>
+
+    <meta charset="utf-8">
+    <a href="/Beta1.0/index.html">
+	<img border="0"  src="/Beta1.0/home.png" width="50" height="50">
+	</a>
+    <style>
+        table.center-all td,
+        th {
+            text-align: center;
+        }
+
+        .pull-left {
+            float: left!important;
+        }
+
+        .pull-right {
+            float: right!important;
+        }
+    </style>
+
+    <script>
+        <!-- APRESENTAR TABELA APENAS QUANDO CLICAR -->
+        $(document).ready(function() {
+            $("#tabela-vistorias").hide();
+        });
+
+        /* set up XMLHttpRequest */
+        function asyncReq(callback) {
+            var url = "LICENCIAMENTOS PROJECTOS.xlsx";
+            var oReq = new XMLHttpRequest();
+            oReq.open("GET", url, true);
+            oReq.responseType = "arraybuffer";
+
+            oReq.onload = function(e) {
+                var arraybuffer = oReq.response;
+
+                /* convert data to binary string */
+                var data = new Uint8Array(arraybuffer);
+                var arr = new Array();
+                for (var i = 0; i != data.length; ++i) arr[i] = String.fromCharCode(data[i]);
+                var bstr = arr.join("");
+
+                /* Call XLSX */
+                var workbook = XLSX.read(bstr, {
+                    type: "binary"
+                });
+
+                /* DO SOMETHING WITH workbook HERE */
+
+                var sheet_name = workbook.SheetNames[1];
+
+                /* Get worksheet */
+
+                var worksheet = workbook.Sheets[sheet_name];
+                var oficios = XLSX.utils.sheet_to_json(worksheet, {
+                    range: 2
+                });
+				$("h4").remove();
+                callback(oficios);
+            }
+            oReq.send();
+        }
+
+        asyncReq(function(result) {
+            console.log(result);
+            $("#tabela-vistorias").show();
+            //DataTable		
+
+            $('#tabela-vistorias').DataTable({
+                "language": {
+                    "lengthMenu": "Apresentar _MENU_ linhas por página",
+                    "search": "Pesquisar:",
+					"info":    "Apresentadas _START_ a _END_ de _TOTAL_ linhas",
+					"next":       "Próximo",
+					"previous":   "Anterior"
+                },
+				
+               
+                "dom": '<"pull-left"f><"pull-right"l>tip',
+                "aaData": result,
+                "aoColumns": [
+
+                    {
+                        "mData": "Concelho",
+                        sDefaultContent: ''
+                    },
+                    {
+                        "mData": "Nº Procº",
+                        sDefaultContent: ''
+                    },
+                    {
+                        "mData": "Designação",
+                        sDefaultContent: ''
+                    },
+                    {
+                        "mData": "Data Resposta",
+                        sDefaultContent: ''
+                    },
+                    {
+                        "mData": "Resposta",
+                        sDefaultContent: ''
+                    }
+                ]
+
+            });
+
+
+        });
+    </script>
+</head>
+
+<body>
+
+    <h1 align="center">LICENCIAMENTOS</h3>
+        <h3 align="center">Situações para Resolução</h3>
+		 <h4 id="h4" align="center">A carregar dados...</h3>
+        <table id="tabela-vistorias" class="display compact" cellspacing="0" style="text-align:center; margin: 0 auto" width="100%">
+            <thead>
+                <tr>
+                    <th style="text-align:center">Concelho</th style="text-align:center">
+                    <th style="text-align:center">Nº Processo</th style="text-align:center">
+                    <th style="text-align:center">Designação</th style="text-align:center">
+                    <th style="text-align:center">Data de Resposta</th style="text-align:center">
+                    <th style="text-align:center">Resposta</th style="text-align:center">
+                </tr>
+            </thead>
+            <tfoot>
+                <tr>
+                    <th style="text-align:center">Concelho</th style="text-align:center">
+                    <th style="text-align:center">Nº Processo</th style="text-align:center">
+                    <th style="text-align:center">Designação</th style="text-align:center">
+                    <th style="text-align:center">Data de Resposta</th style="text-align:center">
+                    <th style="text-align:center">Resposta</th style="text-align:center">
+                </tr>
+            </tfoot>
+        </table>
+</body>
+
+</html>
